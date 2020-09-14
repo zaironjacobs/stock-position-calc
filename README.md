@@ -26,7 +26,7 @@ Launch tool:
 $ stock-position-calc
 ```
 
-Create an executable to run the program:
+Or create a file to run the program
 -----
 
 Windows:
@@ -46,7 +46,7 @@ $ pipenv run pyinstaller stock_position_calc/app.py --onefile --windowed
 $ sudo chmod +x dist/app
 ```
 
-Check for the executable in the created dist directory.
+The output file can be found in the dist folder.
 
 ------
 

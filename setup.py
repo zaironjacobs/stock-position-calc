@@ -15,8 +15,8 @@ setup(
     author_email='zaironjacobs@gmail.com',
     description='A simple program to calculate the right amount of shares to buy while limiting risk.',
     long_description=long_description,
-    url='https://github.com/zaijacobs/stock-position-calc',
-    download_url='https://github.com/zaijacobs/stock-position-calc/archive/v' + __version__ + '.tar.gz',
+    url='https://github.com/zaironjacobs/stock-position-calc',
+    download_url='https://github.com/zaironjacobs/stock-position-calc/archive/v' + __version__ + '.tar.gz',
     keywords=['stock', 'market', 'price', 'calculation', 'investment', 'tool'],
     packages=find_packages(),
     entry_points={

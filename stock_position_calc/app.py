@@ -62,7 +62,7 @@ class App:
     def get_current_currency_symbol(self):
         return self.__current_currency_symbol_stringvar.get()
 
-    def __action(self):
+    def __init_calculation(self):
         """ Initialize the calculation """
 
         current_strategy = self.__current_strategy_stringvar.get()
@@ -239,7 +239,7 @@ class App:
         # CALCULATE BUTTON
         Button(self.__root, font=(self.__default_font_style, self.__default_font_size, self.__default_font_weight),
                width=self.__default_button_width,
-               text='Calculate', command=lambda: self.__action()).pack(side=TOP, pady=15)
+               text='Calculate', command=lambda: self.__init_calculation()).pack(side=TOP, pady=15)
 
         # EXIT BUTTON
         Button(self.__root, font=(self.__default_font_style, self.__default_font_size, self.__default_font_weight),

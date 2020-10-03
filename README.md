@@ -7,30 +7,28 @@ Stock Position Calculator
 
 A simple program to manage risk and calculate the right amount of shares to buy.
 
-Install with pip
------
+## Install with pip
 
 To install:
-```bash
+```console
 $ pip install stock-position-calc
 ```
 
 For some Linux distributions you will need to install the tkinter package:
-```bash
+```console
 $ sudo apt update
 $ sudo apt install python3-tk
 ```
 
-Launch tool:
-```bash
+Launch program:
+```console
 $ stock-position-calc
 ```
 
-Or create a file to run the program
------
+## Or create a file to run the program
 
 Windows:
-```bash
+```console
 $ git clone https://github.com/zaijacobs/stock-position-calc.git
 $ cd stock-position-calc
 $ pipenv install
@@ -38,7 +36,7 @@ $ pipenv run pyinstaller stock_position_calc/app.py --onefile --windowed
 ```
 
 Linux:
-```bash
+```console
 $ git clone https://github.com/zaijacobs/stock-position-calc.git
 $ cd stock-position-calc
 $ pipenv install
@@ -48,7 +46,7 @@ $ sudo chmod +x dist/app
 
 The output file can be found in the dist folder.
 
-------
+## Usage
 
 #### Fixed Cash Amount: 
 Will calculate the number of shares solely based on the amount you want to invest in a trade.

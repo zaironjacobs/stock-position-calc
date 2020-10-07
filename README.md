@@ -14,6 +14,11 @@ To install:
 $ pip install stock-position-calc
 ```
 
+To upgrade:
+```console
+$ pip install stock-position-calc --upgrade
+```
+
 For some Linux distributions you will need to install the tkinter package:
 ```console
 $ sudo apt update
@@ -31,7 +36,7 @@ Windows:
 ```console
 $ git clone https://github.com/zaironjacobs/stock-position-calc.git
 $ cd stock-position-calc
-$ pipenv install
+$ pipenv install --dev
 $ pipenv run pyinstaller stock_position_calc/app.py --onefile --windowed
 ```
 
@@ -39,7 +44,7 @@ Linux:
 ```console
 $ git clone https://github.com/zaironjacobs/stock-position-calc.git
 $ cd stock-position-calc
-$ pipenv install
+$ pipenv install --dev
 $ pipenv run pyinstaller stock_position_calc/app.py --onefile --windowed
 $ sudo chmod +x dist/app
 ```

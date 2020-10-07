@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 pyinstaller = "*"
 pywin32-ctypes = "*"
+pytest = "*"
 
 [packages]
 

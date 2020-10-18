@@ -2,7 +2,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 name = 'stock-position-calc'
-version = '1.0.8'
+version = '1.0.9'
 
 with open('README.md', 'r') as fh:
     long_description = fh.read()

@@ -1,83 +1,104 @@
-from tkinter import messagebox
 from abc import ABC, abstractmethod
 
-from stock_position_calc import validate
-from stock_position_calc import currency_formatter
+from . import validate
 
 
 class State(ABC):
 
     def __init__(self):
-        self.__context = None
+        self._funds = None
+        self._entry_price = None
+        self._risk = None
+        self._trailing_stop = None
+        self._stop_price = None
 
-    @property
-    def context(self):
-        return self.__context
-
-    @context.setter
-    def context(self, context):
-        self.__context = context
+        self._shares = None
+        self._equity_at_risk = None
 
     @abstractmethod
-    def calculate(self, funds, entry_price, risk, trailing_stop, stop_price):
+    def set_values(self, funds, entry_price, risk, trailing_stop, stop_price):
+        pass
+
+    @abstractmethod
+    def calculate_shares(self):
+        pass
+
+    @abstractmethod
+    def calculate_position_value(self):
+        pass
+
+    @abstractmethod
+    def calculate_equity_at_risk(self):
+        pass
+
+    @abstractmethod
+    def calculate_stop_price(self):
         pass
 
 
 class StateA(State):
     """
-    Strategy: Fixed Dollar
+    Strategy: Fixed Cash Amount
     Stop type: Trailing stop
     """
 
-    def calculate(self, funds, entry_price, risk, trailing_stop, stop_price):
-        results_stringvars_dict = self.context.get_results_stringvars_dict()
-        current_currency = self.context.get_current_currency()
-        currency_symbol = self.context.get_current_currency_symbol()
+    def set_values(self, funds, entry_price, risk, trailing_stop, stop_price):
+        self._funds = funds
+        self._entry_price = entry_price
+        self._risk = None
+        self._trailing_stop = trailing_stop
+        self._stop_price = None
 
-        validate_result = validate.validate_state_a_values(funds, entry_price, trailing_stop)
+        validate_result = validate.validate_state_a_values(self._funds, self._entry_price, self._trailing_stop)
         if validate_result.get('status') == 'error':
-            error_message = validate_result.get('error_message')
-            messagebox.showerror('Error', error_message)
-            return
+            return validate_result.get('error_message')
 
-        shares = int(float(funds) / float(entry_price))
-        results_stringvars_dict.get('shares').set(str(shares))
-        position_value = float(shares) * float(entry_price)
-        results_stringvars_dict.get('position_value').set(
-            currency_symbol + currency_formatter.float_to_currency(position_value, current_currency))
-        equity_at_risk = '-'
-        results_stringvars_dict.get('equity_at_risk').set(equity_at_risk)
-        stop_price = float(entry_price) * ((100 - float(trailing_stop)) / 100)
-        results_stringvars_dict.get('stop_price').set(
-            currency_symbol + currency_formatter.float_to_currency(stop_price, current_currency))
+        self._stop_price = self.calculate_stop_price()
+        self._shares = self.calculate_shares()
+
+    def calculate_shares(self):
+        return int(float(self._funds) / float(self._entry_price))
+
+    def calculate_position_value(self):
+        return float(self._shares) * float(self._entry_price)
+
+    def calculate_equity_at_risk(self):
+        return None
+
+    def calculate_stop_price(self):
+        return float(self._entry_price) * ((100 - float(self._trailing_stop)) / 100)
 
 
 class StateB(State):
     """
-    Strategy: Fixed Dollar
+    Strategy: Fixed Cash Amount
     Stop type: Stop price
     """
 
-    def calculate(self, funds, entry_price, risk, trailing_stop, stop_price):
-        results_stringvars_dict = self.context.get_results_stringvars_dict()
-        current_currency = self.context.get_current_currency()
-        currency_symbol = self.context.get_current_currency_symbol()
+    def set_values(self, funds, entry_price, risk, trailing_stop, stop_price):
+        self._funds = funds
+        self._entry_price = entry_price
+        self._risk = None
+        self._trailing_stop = None
+        self._stop_price = stop_price
 
         validate_result = validate.validate_state_b_values(funds, entry_price, stop_price)
         if validate_result.get('status') == 'error':
-            error_message = validate_result.get('error_message')
-            messagebox.showerror('Error', error_message)
-            return
+            return validate_result.get('error_message')
 
-        shares = int(float(funds) / float(entry_price))
-        results_stringvars_dict.get('shares').set(str(shares))
-        position_value = float(shares) * float(entry_price)
-        results_stringvars_dict.get('position_value').set(
-            currency_symbol + currency_formatter.float_to_currency(position_value, current_currency))
-        equity_at_risk = '-'
-        results_stringvars_dict.get('equity_at_risk').set(equity_at_risk)
-        results_stringvars_dict.get('stop_price').set(
-            currency_symbol + currency_formatter.float_to_currency(float(stop_price), current_currency))
+        self._shares = self.calculate_shares()
+
+    def calculate_shares(self):
+        return int(float(self._funds) / float(self._entry_price))
+
+    def calculate_position_value(self):
+        return float(self._shares) * float(self._entry_price)
+
+    def calculate_equity_at_risk(self):
+        return None
+
+    def calculate_stop_price(self):
+        return self._stop_price
 
 
 class StateC(State):
@@ -86,28 +107,32 @@ class StateC(State):
     Stop type: Trailing stop
     """
 
-    def calculate(self, funds, entry_price, risk, trailing_stop, stop_price):
-        results_stringvars_dict = self.context.get_results_stringvars_dict()
-        current_currency = self.context.get_current_currency()
-        currency_symbol = self.context.get_current_currency_symbol()
+    def set_values(self, funds, entry_price, risk, trailing_stop, stop_price):
+        self._funds = funds
+        self._entry_price = entry_price
+        self._risk = risk
+        self._trailing_stop = trailing_stop
+        self._stop_price = None
 
         validate_result = validate.validate_state_c_values(funds, entry_price, risk, trailing_stop)
         if validate_result.get('status') == 'error':
-            error_message = validate_result.get('error_message')
-            messagebox.showerror('Error', error_message)
-            return
+            return validate_result.get('error_message')
 
-        equity_at_risk = float(funds) * (float(risk) / 100)
-        results_stringvars_dict.get('equity_at_risk').set(
-            currency_symbol + currency_formatter.float_to_currency(equity_at_risk, current_currency))
-        stop_price = float(entry_price) * ((100 - float(trailing_stop)) / 100)
-        results_stringvars_dict.get('stop_price').set(
-            currency_symbol + currency_formatter.float_to_currency(stop_price, current_currency))
-        shares = float(equity_at_risk) / (float(entry_price) - float(stop_price))
-        results_stringvars_dict.get('shares').set(str(int(shares)))
-        position_value = int(shares) * float(entry_price)
-        results_stringvars_dict.get('position_value').set(
-            currency_symbol + currency_formatter.float_to_currency(position_value, current_currency))
+        self._equity_at_risk = self.calculate_equity_at_risk()
+        self._stop_price = self.calculate_stop_price()
+        self._shares = self.calculate_shares()
+
+    def calculate_shares(self):
+        return int(float(self._equity_at_risk) / (float(self._entry_price) - float(self._stop_price)))
+
+    def calculate_position_value(self):
+        return int(self._shares) * float(self._entry_price)
+
+    def calculate_equity_at_risk(self):
+        return float(self._funds) * (float(self._risk) / 100)
+
+    def calculate_stop_price(self):
+        return float(self._entry_price) * ((100 - float(self._trailing_stop)) / 100)
 
 
 class StateD(State):
@@ -116,23 +141,28 @@ class StateD(State):
     Stop type: Stop price
     """
 
-    def calculate(self, funds, entry_price, risk, trailing_stop, stop_price):
-        results_stringvars_dict = self.context.get_results_stringvars_dict()
-        current_currency = self.context.get_current_currency()
-        currency_symbol = self.context.get_current_currency_symbol()
+    def set_values(self, funds, entry_price, risk, trailing_stop, stop_price):
+        self._funds = funds
+        self._entry_price = entry_price
+        self._risk = risk
+        self._trailing_stop = trailing_stop
+        self._stop_price = stop_price
 
         validate_result = validate.validate_state_d_values(funds, entry_price, risk, stop_price)
         if validate_result.get('status') == 'error':
-            error_message = validate_result.get('error_message')
-            messagebox.showerror('Error', error_message)
-            return
+            return validate_result.get('error_message')
 
-        equity_at_risk = float(funds) * (float(risk) / 100)
-        results_stringvars_dict.get('equity_at_risk').set(
-            currency_symbol + currency_formatter.float_to_currency(equity_at_risk, current_currency))
-        results_stringvars_dict.get('stop_price').set(currency_symbol + str(stop_price))
-        shares = float(equity_at_risk) / (float(entry_price) - float(stop_price))
-        results_stringvars_dict.get('shares').set(str(int(shares)))
-        position_value = int(shares) * float(entry_price)
-        results_stringvars_dict.get('position_value').set(
-            currency_symbol + currency_formatter.float_to_currency(position_value, current_currency))
+        self._equity_at_risk = self.calculate_equity_at_risk()
+        self._shares = self.calculate_shares()
+
+    def calculate_shares(self):
+        return int(float(self._equity_at_risk) / (float(self._entry_price) - float(self._stop_price)))
+
+    def calculate_position_value(self):
+        return int(self._shares) * float(self._entry_price)
+
+    def calculate_equity_at_risk(self):
+        return float(self._funds) * (float(self._risk) / 100)
+
+    def calculate_stop_price(self):
+        return self._stop_price

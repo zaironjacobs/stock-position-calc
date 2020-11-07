@@ -1,7 +1,8 @@
 from tkinter import *
+from tkinter import messagebox
 
-from stock_position_calc import state as app_state
-from stock_position_calc import currency_formatter
+from . import state as app_state
+from . import currency_formatter
 
 
 def main():
@@ -53,13 +54,10 @@ class App:
 
         self.__root.mainloop()
 
-    def get_results_stringvars_dict(self):
-        return self.__results_stringvars_dict
-
-    def get_current_currency(self):
+    def __get_current_currency(self):
         return self.__current_currency_stringvar.get()
 
-    def get_current_currency_symbol(self):
+    def __get_current_currency_symbol(self):
         return self.__current_currency_symbol_stringvar.get()
 
     def __init_calculation(self):
@@ -78,26 +76,49 @@ class App:
             self.__change_state(app_state.StateD())
 
         funds = currency_formatter.currency_to_float(self.__form_entries_dict.get(
-            'funds').get(), self.get_current_currency())
+            'funds').get(), self.__get_current_currency())
         entry_price = currency_formatter.currency_to_float(self.__form_entries_dict.get(
-            'entry_price').get(), self.get_current_currency())
+            'entry_price').get(), self.__get_current_currency())
         risk = currency_formatter.currency_to_float(self.__form_entries_dict.get(
-            'risk').get(), self.get_current_currency())
+            'risk').get(), self.__get_current_currency())
         trailing_stop = currency_formatter.currency_to_float(self.__form_entries_dict.get(
-            'trailing_stop').get(), self.get_current_currency())
+            'trailing_stop').get(), self.__get_current_currency())
         stop_price = currency_formatter.currency_to_float(self.__form_entries_dict.get(
-            'stop_price').get(), self.get_current_currency())
+            'stop_price').get(), self.__get_current_currency())
 
-        self.__state.calculate(funds, entry_price, risk, trailing_stop, stop_price)
+        error_message = self.__state.set_values(funds, entry_price, risk, trailing_stop, stop_price)
+        if error_message:
+            messagebox.showerror('Error', error_message)
+            return
+
+        calculated_shares = self.__state.calculate_shares()
+        self.__results_stringvars_dict.get('shares').set(str(calculated_shares))
+
+        calculated_position_value = self.__state.calculate_position_value()
+        self.__results_stringvars_dict.get('position_value').set(
+            self.__get_current_currency_symbol() + currency_formatter.float_to_currency(
+                calculated_position_value, self.__get_current_currency()))
+
+        calculated_equity_at_risk = self.__state.calculate_equity_at_risk()
+        if calculated_equity_at_risk is not None:
+            self.__results_stringvars_dict.get('equity_at_risk').set(
+                self.__get_current_currency_symbol() + currency_formatter.float_to_currency(
+                    calculated_equity_at_risk, self.__get_current_currency()))
+        else:
+            self.__results_stringvars_dict.get('equity_at_risk').set('-')
+
+        calculated_stop_price = self.__state.calculate_stop_price()
+        self.__results_stringvars_dict.get('stop_price').set(
+            self.__get_current_currency_symbol() + currency_formatter.float_to_currency(
+                calculated_stop_price, self.__get_current_currency()))
 
     def __change_state(self, state):
         """ Change to given state """
 
         self.__state = state
-        self.__state.context = self
 
     def __refresh_ui_currency(self):
-        """ UI changes regarding the current currency  """
+        """ UI changes concerning the current currency  """
 
         currency_symbol = self.__currencies_dict.get(self.__current_currency_stringvar.get())
         self.__current_currency_symbol_stringvar.set(currency_symbol)
@@ -110,7 +131,7 @@ class App:
             value.set('')
 
     def __refresh_ui_strategy(self):
-        """ UI changes regarding the current strategy  """
+        """ UI changes concerning the current strategy  """
 
         if self.__current_strategy_stringvar.get() == self.__strategies_dict.get('fixed_cash'):
             self.__form_entries_dict.get('risk').delete(0, END)
@@ -119,7 +140,7 @@ class App:
             self.__form_entries_dict.get('risk').config(state='normal')
 
     def __refresh_ui_stop_type(self):
-        """ UI changes regarding the current stop type  """
+        """ UI changes concerning the current stop type  """
 
         if self.__current_stop_type_stringvar.get() == self.__stop_types_dict.get('trailing_stop'):
             self.__form_entries_dict.get('trailing_stop').config(state='normal')
@@ -219,14 +240,14 @@ class App:
         for key, value in self.__form_entries_dict.items():
             if key == 'funds' or key == 'entry_price' or key == 'stop_price':
                 value_str = value.get()
-                if self.get_current_currency() == 'USD':
+                if self.__get_current_currency() == 'USD':
                     value_str = value_str.replace(',', '')
-                elif self.get_current_currency() == 'EUR':
+                elif self.__get_current_currency() == 'EUR':
                     value_str = value_str.replace(',', '.')
                 if value_str == '':
                     continue
                 try:
-                    number = currency_formatter.float_to_currency(float(value_str), self.get_current_currency())
+                    number = currency_formatter.float_to_currency(float(value_str), self.__get_current_currency())
                 except ValueError:
                     pass
                 else:
@@ -293,7 +314,3 @@ class App:
         """ Quit the app """
 
         self.__root.quit()
-
-
-if __name__ == '__main__':
-    main()

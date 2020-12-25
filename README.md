@@ -34,7 +34,7 @@ $ stock-position-calc
 
 Windows:
 ```console
-$ git clone https://github.com/zaironjacobs/stock-position-calc.git
+$ git clone https://github.com/zaironjacobs/stock-position-calc
 $ cd stock-position-calc
 $ pipenv install --dev
 $ pipenv run pyinstaller stock_position_calc/app.py --onefile --windowed
@@ -42,7 +42,7 @@ $ pipenv run pyinstaller stock_position_calc/app.py --onefile --windowed
 
 Linux:
 ```console
-$ git clone https://github.com/zaironjacobs/stock-position-calc.git
+$ git clone https://github.com/zaironjacobs/stock-position-calc
 $ cd stock-position-calc
 $ pipenv install --dev
 $ pipenv run pyinstaller stock_position_calc/app.py --onefile --windowed
